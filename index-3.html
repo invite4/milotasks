@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Milo Tasks</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#f4fbf6;--card:#fff;--text:#16241b;--muted:#8a9c90;--line:#d9ecdf;--g1:#17c964;--g2:#00a651;--soft:#e2f6e9;--gold:#f2b705}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1710;--card:#16241b;--text:#eaf6ee;--muted:#8fa896;--line:#24392b;--soft:#1d3a28}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:480px;margin:0 auto;padding:0 16px 130px}
+.hide{display:none!important}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px}
+.logo i{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--g1),#00793f);display:grid;place-items:center}
+.logo b{color:var(--g2)}
+.chip{background:rgba(18,161,80,.16);color:var(--g2);font-weight:700;padding:9px 14px;border-radius:99px}
+.wallet{border-radius:26px;padding:22px;color:#fff;background:linear-gradient(135deg,#1fd36f,#00a651 45%,#005c33);box-shadow:0 14px 30px -10px rgba(0,122,63,.6)}
+.bal{font-size:40px;font-weight:800;margin:6px 0 12px}
+.bar{height:8px;border-radius:9px;background:rgba(255,255,255,.28);overflow:hidden;margin-bottom:6px}
+.bar div{height:100%;background:var(--gold);transition:width .4s}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+.btn{border:0;cursor:pointer;font:inherit;font-weight:700;color:#fff;background:rgba(255,255,255,.25);padding:12px 18px;border-radius:99px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 6px;text-align:center}
+.stat b{display:block;font-size:16px}.stat em{font-style:normal;color:var(--muted);font-size:12px}
+h2{font-size:20px;margin:20px 0 12px}
+.task{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:12px}
+.ic{width:52px;height:52px;border-radius:15px;background:var(--soft);display:grid;place-items:center;font-size:24px;flex:none}
+.info{flex:1}.info b{display:block}.info small{color:var(--muted)}
+.rt{text-align:right}.rt strong{color:var(--g2);display:block}
+.go{display:inline-block;text-decoration:none;text-align:center;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:13px;color:#fff;background:linear-gradient(135deg,var(--g1),#00793f);padding:8px 16px;border-radius:99px;margin-top:4px}
+.go[disabled]{opacity:.45}
+.done{color:var(--g2);font-weight:700;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
+.card p{color:var(--muted);line-height:1.5;margin:6px 0}
+.ref{border-radius:22px;padding:18px;color:#fff;background:linear-gradient(135deg,#00a651,#005c33)}
+.ref p{margin:6px 0 12px;font-size:14px}
+.lbl{font-size:12px;opacity:.85;margin:10px 0 4px}
+.box{border:1px dashed #ffd166;color:#ffd166;font-weight:800;padding:12px 14px;border-radius:12px;word-break:break-all}
+.box.code{letter-spacing:3px;font-size:20px}
+.ref .go{background:#ffd166;color:#2f1a0b;margin:10px 8px 0 0}
+.support{display:flex;align-items:center;gap:14px;border-radius:22px;padding:16px;margin-top:16px;background:linear-gradient(135deg,#5a3419,#2f1a0b);color:#fff;border:1px solid var(--gold);text-decoration:none}
+.support b{color:#ffd166}.support .ic{background:rgba(255,255,255,.15)}
+.note{color:var(--muted);font-size:13px}
+.hr{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:36px;box-shadow:0 18px 40px -12px rgba(0,60,30,.35);padding:8px;display:flex;justify-content:space-between;align-items:center;z-index:10}
+.dock button{background:none;border:0;font:inherit;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-weight:700;font-size:12.5px;padding:10px 12px;border-radius:24px;cursor:pointer;min-width:62px}
+.dock svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.dock button.on{color:#fff;background:linear-gradient(135deg,#00b35a,#005c33);box-shadow:0 10px 20px -8px rgba(0,92,51,.7)}
+.dock .fab{width:68px;height:68px;min-width:68px;margin-top:-40px;padding:0;border-radius:50%;background:linear-gradient(135deg,#ffd84a,#f2b705);color:#2f1a0b;border:6px solid var(--card);box-shadow:0 0 30px rgba(242,183,5,.55);justify-content:center}
+.dock .fab svg{transform:rotate(45deg);width:30px;height:30px}
+.dock .fab.on{background:linear-gradient(135deg,#ffd84a,#f2b705);color:#2f1a0b}
+.modal{position:fixed;inset:0;background:rgba(5,20,10,.6);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.show{display:flex}
+.sheet{background:var(--card);width:100%;max-width:480px;max-height:90vh;overflow:auto;border-radius:26px 26px 0 0;padding:22px 20px 26px}
+.sheet h3{margin:0 0 8px}.sheet p{color:var(--muted);line-height:1.5}
+input{width:100%;font:inherit;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--text);margin:6px 0}
+.sheet .go,.auth .go{width:100%;padding:14px;font-size:16px;margin-top:10px;display:block}
+.alt{background:#4a2c17!important}
+.news{background:var(--soft);border-radius:16px;padding:6px 14px;line-height:1.6;font-size:15px;max-height:46vh;overflow:auto}
+.news h4{margin:14px 0 4px;font-size:16px}.news p{color:var(--text);margin:6px 0}
+.msg{color:#d93025;font-size:13px;min-height:18px}.msg.ok{color:var(--g2)}
+.recv{background:var(--soft);border-radius:14px;padding:12px;font-weight:700}
+.auth{margin-top:30px}.auth h1{margin:20px 0 4px}
+</style>
+</head>
+<body>
+
+<section class="auth" id="auth">
+  <div class="logo"><i><svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2 20 5v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#fff"/><path d="M8 15.5V9.5l4 4 4-4v6" fill="none" stroke="#00793f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="6.2" r="1.1" fill="#ffb703"/></svg></i><span>Milo<b>Tasks</b></span></div>
+  <h1 id="at">Welcome back</h1>
+  <p class="note" id="an">Complete simple tasks and earn ₦500 each.</p>
+  <input id="em" type="email" placeholder="Email address" autocomplete="email">
+  <input id="pw" type="password" placeholder="Password (min 6 characters)" autocomplete="current-password">
+  <input id="rf" placeholder="Referral code (optional)">
+  <div class="msg" id="am"></div>
+  <button class="go" id="ab">Log in</button>
+  <p class="note" style="text-align:center"><a href="#" id="sw" style="color:var(--g2);font-weight:700">New here? Create an account</a></p>
+</section>
+
+<section id="app" class="hide">
+  <header>
+    <div class="logo"><i><svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2 20 5v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#fff"/><path d="M8 15.5V9.5l4 4 4-4v6" fill="none" stroke="#00793f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="6.2" r="1.1" fill="#ffb703"/></svg></i><span>Milo<b>Tasks</b></span></div>
+    <div class="chip" id="chip">₦0</div>
+  </header>
+
+  <div id="v-home" class="view">
+    <div class="wallet">
+      <small>Wallet balance</small>
+      <div class="bal" id="bal">₦0</div>
+      <div class="bar"><div id="fill" style="width:0%"></div></div>
+      <small id="prog"></small>
+      <div class="row"><small id="tot"></small><button class="btn wd">⬇ Withdraw</button></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="s1">₦0</b><em>Earned</em></div>
+      <div class="stat"><b id="s2">0/3</b><em>Tasks done</em></div>
+      <div class="stat"><b id="s3">0</b><em>Referrals</em></div>
+    </div>
+    <h2>Available tasks</h2><div class="tl"></div>
+  </div>
+
+  <div id="v-tasks" class="view hide">
+    <h2 style="margin-top:6px">Tasks</h2><div class="tl"></div>
+    <p class="note">Each task pays its reward immediately when you complete it.</p>
+  </div>
+
+  <div id="v-invite" class="view hide">
+    <h2 style="margin-top:6px">Invite &amp; earn</h2>
+    <section class="ref">
+      <b id="rb1">🎉 Earn ₦500 for every person you invite</b>
+      <p id="rb2">Share your invite link or code. You receive ₦500 immediately when someone joins.</p>
+      <div class="lbl">Your invite link</div><div class="box" id="il"></div>
+      <div class="lbl">Your invite code</div><div class="box code" id="rc"></div>
+      <button class="go" id="cpl">Copy link</button><button class="go" id="cpc">Copy code</button>
+      <p style="margin:14px 0 0">Referrals: <b id="rn">0</b></p>
+    </section>
+  </div>
+
+  <div id="v-wallet" class="view hide">
+    <h2 style="margin-top:6px">Wallet</h2>
+    <div class="wallet"><small>Available balance</small><div class="bal" id="bal2">₦0</div><button class="btn wd">⬇ Withdraw</button></div>
+    <div class="card" style="margin-top:14px"><b>Withdrawal rules</b><p id="wdr">Minimum withdrawal is ₦30,000. A 16.67% charge applies, so withdrawing ₦30,000 means you receive ₦25,000.</p></div>
+    <h2>History</h2><div class="card" id="hist"><p>No withdrawals yet.</p></div>
+  </div>
+
+  <div id="v-profile" class="view hide">
+    <h2 style="margin-top:6px">Profile</h2>
+    <div class="card"><div class="hr"><span>Email</span><b id="pe"></b></div><div class="hr"><span>Invite code</span><b id="pc"></b></div><div class="hr"><span>Total earned</span><b id="pt"></b></div></div>
+    <a class="support" style="margin:16px 0 12px" href="https://t.me/MichealUpdate01" target="_blank" rel="noopener"><div class="ic">💬</div><div><b>Contact Support</b><br><small>Report any problem on our Telegram channel.</small></div></a>
+    <button class="go alt" id="lo" style="width:100%;padding:14px;font-size:16px">Log out</button>
+  </div>
+
+  <nav class="dock">
+    <button data-v="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+    <button data-v="tasks"><svg viewBox="0 0 24 24"><path d="m4 6 2 2 3-3M4 15l2 2 3-3M12 7h8M12 16h8"/></svg>Tasks</button>
+    <button data-v="invite" class="fab" aria-label="Invite"><svg viewBox="0 0 24 24"><path d="M12 3c3 2 5 5 5 9l-2 3H9l-2-3c0-4 2-7 5-9z"/><circle cx="12" cy="10" r="1.5"/><path d="m9 15-2 4 3-1m5-3 2 4-3-1"/></svg></button>
+    <button data-v="wallet"><svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h11v3M4 7v11a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H6a2 2 0 0 1-2-1zM16 14h2"/></svg>Wallet</button>
+    <button data-v="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>Profile</button>
+  </nav>
+</section>
+
+<template id="newsT">
+<h4>A New Opportunity for Everyone 🚀</h4>
+<p>Welcome to <b>MILO TASKS</b>, a platform built around opportunity, hard work, and the power of digital technology.</p>
+<p>We believe that the internet can offer people more than just entertainment. It can also create opportunities for people to learn, participate in online activities, complete tasks, and earn rewards for their efforts.</p>
+<p>This belief inspired the vision behind MILO TASKS: to build a simple, accessible, and user-friendly platform where people can participate in available tasks and enjoy the benefits of their efforts.</p>
+<h4>💡 OUR VISION</h4>
+<p>Our vision is to create a platform where online opportunities are easy to understand and accessible to more people. We want our members to have a smooth experience, from creating an account to completing tasks and tracking their rewards.</p>
+<h4>🎯 OUR MISSION</h4>
+<p>Our mission is to provide a reliable and transparent task platform where members can explore available opportunities, complete eligible tasks, and receive rewards according to clearly stated platform rules.</p>
+<h4>🤝 BUILDING TRUST TOGETHER</h4>
+<p>Trust is important to us. That is why we believe in clear information, fair rules, responsible platform management, and keeping our members informed about available tasks, rewards, and withdrawal requirements.</p>
+<p>We want every member to understand how MILO TASKS works before participating.</p>
+<h4>🚀 THE JOURNEY STARTS WITH YOU</h4>
+<p>Every great platform begins with a vision. At MILO TASKS, we look forward to building a community of people who believe in opportunities, consistency, and progress.</p>
+</template>
+
+<div class="modal" id="tm"><div class="sheet" id="ts"></div></div>
+<div class="modal" id="m"><div class="sheet">
+  <h3>Withdraw</h3>
+  <p id="wdp">Minimum ₦30,000. A 16.67% charge applies.</p>
+  <input id="bank" placeholder="Bank name">
+  <input id="acc" placeholder="Account number" inputmode="numeric">
+  <input id="amt" placeholder="Amount (₦)" inputmode="numeric">
+  <div class="recv" id="recv">You will receive ₦0</div>
+  <div class="msg" id="err"></div>
+  <button class="go" id="sub">Request withdrawal</button>
+</div></div>
+
+<script>
+// ====== PUT YOUR SUPABASE DETAILS HERE (Supabase > Project Settings > API) ======
+var SUPABASE_URL="https://famxzlanyngsyrzfidhq.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_xyTHdvmlPtlP0VCyADJKPA_ZOO8YG6o";
+// ================================================================================
+var sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY),MIN=30000,P=null,D={},mode="login",timer=null;
+var $=function(i){return document.getElementById(i)};
+function f(n){return "₦"+Math.round(n).toLocaleString("en-NG")}
+var T=[],FEE=16.6667,REFB=500,WB=1000;
+
+var ref=new URLSearchParams(location.search).get("ref");if(ref)$("rf").value=ref;
+$("rf").classList.add("hide");
+$("sw").onclick=function(e){e.preventDefault();mode=mode==="login"?"signup":"login";var l=mode==="login";
+  $("at").textContent=l?"Welcome back":"Create account";
+  $("an").textContent=l?"Complete simple tasks and earn ₦500 each.":"🎁 Sign up and get a "+f(WB)+" welcome bonus!";
+  $("ab").textContent=l?"Log in":"Sign up";
+  $("sw").textContent=l?"New here? Create an account":"Have an account? Log in";
+  $("rf").classList.toggle("hide",l);$("am").textContent=""};
+if(ref)$("sw").click();
+$("ab").onclick=async function(){
+  var em=$("em").value.trim(),pw=$("pw").value,am=$("am");am.className="msg";am.textContent="Please wait...";
+  var r=mode==="login"?await sb.auth.signInWithPassword({email:em,password:pw})
+    :await sb.auth.signUp({email:em,password:pw,options:{data:{ref:$("rf").value.trim()}}});
+  if(r.error){am.textContent=r.error.message;return}
+  if(mode==="signup"&&!r.data.session){am.className="msg ok";am.textContent="Check your email to confirm, then log in.";return}
+  start();
+};
+$("lo").onclick=async function(){await sb.auth.signOut();$("app").classList.add("hide");$("auth").classList.remove("hide")};
+
+function show(v){
+  document.querySelectorAll(".view").forEach(function(x){x.classList.add("hide")});
+  $("v-"+v).classList.remove("hide");
+  document.querySelectorAll(".dock button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".dock button").forEach(function(b){b.onclick=function(){show(b.dataset.v)}});
+
+async function start(){
+  var s=(await sb.auth.getSession()).data.session;if(!s)return;
+  $("auth").classList.add("hide");$("app").classList.remove("hide");show("home");load();
+}
+async function load(){
+  var st=await sb.from("settings").select("*");(st.data||[]).forEach(function(x){if(x.key==="min_withdraw")MIN=+x.value;if(x.key==="fee_pct")FEE=+x.value;if(x.key==="referral_bonus")REFB=+x.value});
+  var tk=await sb.from("tasks").select("*").eq("active",true).order("sort");T=tk.data||[];
+  var fe=+FEE.toFixed(2);
+  $("wdp").textContent="Minimum "+f(MIN)+". A "+fe+"% charge applies.";
+  $("wdr").textContent="Minimum withdrawal is "+f(MIN)+". A "+fe+"% charge applies, so withdrawing "+f(MIN)+" means you receive "+f(MIN*(100-FEE)/100)+".";
+  $("rb1").textContent="🎉 Earn "+f(REFB)+" for every person you invite";
+  $("rb2").textContent="Share your invite link or code. You receive "+f(REFB)+" immediately when someone joins.";
+  var p=await sb.from("profiles").select("*").single();P=p.data;
+  var d=await sb.from("tasks_done").select("task_id");D={};(d.data||[]).forEach(function(x){D[x.task_id]=1});
+  if(!P)return;
+  var n=Object.keys(D).length;
+  $("chip").textContent=f(P.balance);$("bal").textContent=f(P.balance);$("bal2").textContent=f(P.balance);
+  $("tot").textContent="Total earned "+f(P.earned);
+  $("prog").textContent=f(P.balance)+" of "+f(MIN)+" minimum withdrawal";
+  $("fill").style.width=Math.min(100,P.balance/MIN*100)+"%";
+  $("s1").textContent=f(P.earned);$("s2").textContent=n+"/"+T.length;$("s3").textContent=P.refs;
+  var link=location.origin+"/?ref="+P.ref_code;
+  $("il").textContent=link;$("rc").textContent=P.ref_code;$("rn").textContent=P.refs;
+  $("pe").textContent=P.email;$("pc").textContent=P.ref_code;$("pt").textContent=f(P.earned);
+  var h=T.map(function(t,i){return '<div class="task"><div class="ic">'+t.emoji+'</div><div class="info"><b>'+t.title+'</b><small>'+(t.type==="news"?(t.seconds||20)+' sec · Read':'Social')+'</small></div><div class="rt"><strong>+'+f(t.reward)+'</strong>'+(D[t.id]?'<div class="done">✔ Done</div>':'<button class="go" data-i="'+i+'">Open</button>')+'</div></div>'}).join("");
+  document.querySelectorAll(".tl").forEach(function(x){x.innerHTML=h});
+  var w=await sb.from("withdrawals").select("amount,receive,status").order("created_at",{ascending:false});
+  if(w.data&&w.data.length)$("hist").innerHTML=w.data.map(function(x){return '<div class="hr"><span>'+f(x.amount)+' → '+f(x.receive)+'</span><b>'+x.status+'</b></div>'}).join("");
+}
+function closeT(){$("tm").classList.remove("show");if(timer){clearInterval(timer);timer=null}}
+function openT(i){
+  var t=T[i],h='<h3>'+t.emoji+' '+t.title+'</h3>',sec=t.seconds||20;
+  if(t.type==="news")h+='<p>Read for '+sec+' seconds: <b id="tt">'+sec+'</b>s left</p><div class="news">'+$("newsT").innerHTML+'</div>';
+  else h+='<p>'+(t.instructions||'Open the link, complete the task, then return to Milo Tasks and tap “I complete this task”.')+'</p><a class="go alt" id="lk" href="'+t.link+'" target="_blank" rel="noopener">Open link</a>';
+  h+='<button class="go" id="fin" disabled>I complete this task</button><div class="msg" id="tmsg"></div><button class="go alt" id="cl">Close</button>';
+  $("ts").innerHTML=h;$("tm").classList.add("show");
+  var fin=$("fin");$("cl").onclick=closeT;
+  fin.onclick=async function(){fin.disabled=true;var r=await sb.rpc("complete_task",{p_task:t.id});
+    if(r.error){$("tmsg").textContent=r.error.message;return}closeT();load()};
+  if(t.type==="news"){var s=sec;timer=setInterval(function(){s--;$("tt").textContent=s;if(s<=0){clearInterval(timer);timer=null;fin.disabled=false}},1000)}
+  else $("lk").onclick=function(){fin.disabled=false};
+}
+document.addEventListener("click",function(e){var i=e.target.getAttribute&&e.target.getAttribute("data-i");if(i!==null&&i!==undefined&&e.target.closest(".tl"))openT(+i)});
+$("tm").onclick=function(e){if(e.target===$("tm"))closeT()};
+
+document.querySelectorAll(".wd").forEach(function(b){b.onclick=function(){$("m").classList.add("show")}});
+$("m").onclick=function(e){if(e.target===$("m"))$("m").classList.remove("show")};
+$("amt").oninput=function(){$("recv").textContent="You will receive "+f((+$("amt").value||0)*(100-FEE)/100)};
+$("sub").onclick=async function(){
+  var a=+$("amt").value,er=$("err");er.className="msg";
+  if($("bank").value.length<2||$("acc").value.length<10){er.textContent="Enter your bank name and a valid account number.";return}
+  var r=await sb.rpc("request_withdrawal",{p_bank:$("bank").value,p_account:$("acc").value,p_amount:a});
+  if(r.error){er.textContent=r.error.message;return}
+  er.className="msg ok";er.textContent="Request sent. You will receive "+f(a*(100-FEE)/100)+" after approval.";load();
+  setTimeout(function(){$("m").classList.remove("show");er.textContent=""},2000);
+};
+function cp(txt,b,old){(navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){b.textContent="Copied ✔";setTimeout(function(){b.textContent=old},1500)},function(){b.textContent="Select and copy"})}
+$("cpl").onclick=function(){cp($("il").textContent,this,"Copy link")};
+$("cpc").onclick=function(){cp($("rc").textContent,this,"Copy code")};
+sb.from("settings").select("*").eq("key","welcome_bonus").then(function(r){if(r.data&&r.data[0])WB=+r.data[0].value});
+start();
+</script>
+</body>
+</html>

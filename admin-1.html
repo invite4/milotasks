@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Milo Tasks Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#0d1710;--card:#16241b;--text:#eaf6ee;--muted:#8fa896;--line:#24392b;--g:#00a651;--gold:#f2b705;--red:#e5484d}
+@media (prefers-color-scheme:light){:root{--bg:#f4fbf6;--card:#fff;--text:#16241b;--muted:#6a7d70;--line:#d9ecdf}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:640px;margin:0 auto;padding:12px 14px 60px}
+.hide{display:none!important}
+h1{font-size:20px;margin:8px 0}h2{font-size:17px;margin:16px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:6px 0 10px;position:sticky;top:0;background:var(--bg);z-index:5}
+.tabs button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:9px 14px;border-radius:99px;font:inherit;font-weight:700;font-size:14px}
+.tabs button.on{background:var(--g);color:#fff;border-color:var(--g)}
+input,select,textarea{width:100%;font:inherit;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--text);margin:4px 0}
+label{font-size:12px;color:var(--muted)}
+.b{border:0;cursor:pointer;font:inherit;font-weight:700;font-size:14px;color:#fff;background:var(--g);padding:10px 16px;border-radius:12px;margin:4px 4px 0 0}
+.b.red{background:var(--red)}.b.gold{background:var(--gold);color:#2f1a0b}.b.grey{background:#55655a}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat b{display:block;font-size:20px}.stat span{color:var(--muted);font-size:13px}
+small{color:var(--muted)}
+.tag{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--line);margin-left:6px}
+.tag.pending{background:var(--gold);color:#2f1a0b}.tag.paid{background:var(--g);color:#fff}.tag.rejected,.tag.ban{background:var(--red);color:#fff}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.show{display:flex}.sheet{background:var(--card);width:100%;max-width:640px;border-radius:22px 22px 0 0;padding:18px;max-height:90vh;overflow:auto}
+.msg{color:var(--red);font-size:13px;min-height:16px}
+</style>
+</head>
+<body>
+<h1>🛡️ Milo Tasks Admin</h1>
+
+<section id="login" class="hide card">
+  <input id="em" type="email" placeholder="Admin email"><input id="pw" type="password" placeholder="Password">
+  <div class="msg" id="lm"></div><button class="b" id="lb">Log in</button>
+</section>
+
+<section id="denied" class="hide card"><b>Access denied.</b><p><small>This account is not an admin. Log in with your admin account.</small></p><button class="b grey" id="lo2">Log out</button></section>
+
+<section id="app" class="hide">
+  <div class="tabs" id="tabs">
+    <button data-t="home" class="on">Overview</button><button data-t="users">Users</button><button data-t="tasks">Tasks</button><button data-t="wd">Withdrawals</button><button data-t="set">Settings</button>
+  </div>
+  <div id="c"></div>
+  <button class="b grey" id="lo" style="margin-top:20px">Log out</button>
+</section>
+
+<div class="modal" id="um"><div class="sheet" id="us"></div></div>
+
+<script>
+var SUPABASE_URL="https://famxzlanyngsyrzfidhq.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_xyTHdvmlPtlP0VCyADJKPA_ZOO8YG6o";
+var sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+var $=function(i){return document.getElementById(i)};
+function f(n){return "₦"+Math.round(+n||0).toLocaleString("en-NG")}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var U=[],W=[],T=[],ST={},cur="home",CU=null;
+
+function view(id){["login","denied","app"].forEach(function(x){$(x).classList.toggle("hide",x!==id)})}
+async function boot(){
+  var s=(await sb.auth.getSession()).data.session;if(!s){view("login");return}
+  var p=await sb.from("profiles").select("is_admin").eq("id",s.user.id).single();
+  if(!p.data||!p.data.is_admin){view("denied");return}
+  view("app");await loadAll();tab(cur);
+}
+$("lb").onclick=async function(){
+  var r=await sb.auth.signInWithPassword({email:$("em").value.trim(),password:$("pw").value});
+  if(r.error){$("lm").textContent=r.error.message;return}boot();
+};
+async function out(){await sb.auth.signOut();view("login")}
+$("lo").onclick=out;$("lo2").onclick=out;
+
+async function loadAll(){
+  var r=await Promise.all([
+    sb.from("profiles").select("*").order("created_at",{ascending:false}).limit(1000),
+    sb.from("withdrawals").select("*,profiles(email)").order("created_at",{ascending:false}).limit(500),
+    sb.from("tasks").select("*").order("sort"),
+    sb.from("settings").select("*")]);
+  U=r[0].data||[];W=r[1].data||[];T=r[2].data||[];ST={};(r[3].data||[]).forEach(function(x){ST[x.key]=x.value});
+}
+$("tabs").onclick=function(e){var t=e.target.getAttribute("data-t");if(t)tab(t)};
+function tab(t){
+  cur=t;document.querySelectorAll("#tabs button").forEach(function(b){b.classList.toggle("on",b.dataset.t===t)});
+  ({home:rHome,users:rUsers,tasks:rTasks,wd:rWd,set:rSet})[t]();
+}
+async function act(p){var r=await p;if(r.error){alert(r.error.message);return false}await loadAll();tab(cur);return true}
+
+function rHome(){
+  var bal=0,earned=0;U.forEach(function(u){bal+=u.balance;earned+=u.earned});
+  var pw=W.filter(function(w){return w.status==="pending"}),pa=0;pw.forEach(function(w){pa+=w.amount});
+  function s(a,b){return '<div class="card stat"><b>'+a+'</b><span>'+b+'</span></div>'}
+  $("c").innerHTML='<div class="grid">'+s(U.length,"Users")+s(f(bal),"Total user balances")+s(f(earned),"Total credited")+s(pw.length+" · "+f(pa),"Pending withdrawals")+s(T.filter(function(t){return t.active}).length,"Active tasks")+s(U.filter(function(u){return u.banned}).length,"Banned users")+'</div>';
+}
+
+function rUsers(){
+  $("c").innerHTML='<input id="q" placeholder="Search email or invite code"><div id="ul"></div>';
+  $("q").oninput=listUsers;listUsers();
+}
+function listUsers(){
+  var q=($("q").value||"").toLowerCase();
+  $("ul").innerHTML=U.filter(function(u){return !q||(u.email||"").toLowerCase().indexOf(q)>-1||(u.ref_code||"").toLowerCase()===q}).slice(0,100).map(function(u){
+    return '<div class="card row"><div><b>'+esc(u.email)+'</b>'+(u.is_admin?'<span class="tag">admin</span>':'')+(u.banned?'<span class="tag ban">banned</span>':'')+'<br><small>'+f(u.balance)+' · refs '+u.refs+' · code '+esc(u.ref_code)+'</small></div><button class="b" data-u="'+esc(u.id)+'">Manage</button></div>'}).join("")||"<small>No users found.</small>";
+}
+$("c").onclick=function(e){
+  var d=e.target.dataset;
+  if(d.u)openUser(d.u);
+  else if(d.et)editTask(d.et);
+  else if(d.dt){if(confirm("Delete this task?"))act(sb.rpc("admin_delete_task",{p_id:d.dt}))}
+  else if(d.w)act(sb.rpc("admin_set_withdrawal",{p_id:+d.w,p_status:d.s}));
+};
+function openUser(id){
+  CU=U.filter(function(u){return u.id===id})[0];if(!CU)return;
+  $("us").innerHTML='<h2 style="margin-top:0">'+esc(CU.email)+'</h2><p><small>Balance '+f(CU.balance)+' · Earned '+f(CU.earned)+' · Referrals '+CU.refs+'</small></p>'+
+  '<label>Add or remove money (use a minus to remove, e.g. -500)</label><input id="ua" inputmode="numeric" placeholder="Amount e.g. 1000 or -500"><input id="un" placeholder="Note (optional)">'+
+  '<button class="b" id="uap">Apply</button><button class="b '+(CU.banned?'gold':'red')+'" id="ub">'+(CU.banned?'Unban user':'Ban user')+'</button><button class="b grey" id="uc">Close</button>';
+  $("um").classList.add("show");
+  $("uc").onclick=function(){$("um").classList.remove("show")};
+  $("uap").onclick=async function(){var a=parseInt($("ua").value,10);if(!a){alert("Enter an amount");return}
+    if(await act(sb.rpc("admin_adjust_balance",{p_user:CU.id,p_amount:a,p_note:$("un").value})))$("um").classList.remove("show")};
+  $("ub").onclick=async function(){if(await act(sb.rpc("admin_set_banned",{p_user:CU.id,p_banned:!CU.banned})))$("um").classList.remove("show")};
+}
+$("um").onclick=function(e){if(e.target===$("um"))$("um").classList.remove("show")};
+
+function rTasks(){
+  $("c").innerHTML='<div class="card"><h2 style="margin-top:0" id="th">Add a task</h2>'+
+  '<label>Task ID (letters/numbers, no spaces, e.g. yt1)</label><input id="tid">'+
+  '<label>Title</label><input id="tt">'+
+  '<div class="grid"><div><label>Type</label><select id="ty"><option value="link">Link task</option><option value="news">News (timer)</option></select></div><div><label>Emoji</label><input id="te" value="🎯"></div></div>'+
+  '<label>Link (for link tasks)</label><input id="tl" placeholder="https://...">'+
+  '<label>Instructions shown to user</label><textarea id="ti" rows="2"></textarea>'+
+  '<div class="grid"><div><label>Reward (₦)</label><input id="tr" inputmode="numeric" value="500"></div><div><label>Timer seconds</label><input id="ts" inputmode="numeric" value="0"></div></div>'+
+  '<div class="grid"><div><label>Order</label><input id="to" inputmode="numeric" value="10"></div><div><label>Active</label><select id="ta"><option value="1">Yes</option><option value="0">No (hidden)</option></select></div></div>'+
+  '<button class="b" id="tsv">Save task</button></div><h2>All tasks</h2>'+
+  T.map(function(t){return '<div class="card row"><div><b>'+esc(t.emoji)+' '+esc(t.title)+'</b>'+(t.active?'':'<span class="tag ban">hidden</span>')+'<br><small>'+esc(t.id)+' · '+f(t.reward)+' · '+esc(t.type)+'</small></div><div><button class="b" data-et="'+esc(t.id)+'">Edit</button><button class="b red" data-dt="'+esc(t.id)+'">Delete</button></div></div>'}).join("");
+  $("tsv").onclick=async function(){
+    var id=$("tid").value.toLowerCase().replace(/[^a-z0-9_-]/g,"");if(!id||!$("tt").value){alert("Task ID and title are required");return}
+    if(await act(sb.rpc("admin_save_task",{p_id:id,p_title:$("tt").value,p_type:$("ty").value,p_link:$("tl").value,p_instr:$("ti").value,p_reward:parseInt($("tr").value,10)||0,p_seconds:parseInt($("ts").value,10)||0,p_emoji:$("te").value||"🎯",p_active:$("ta").value==="1",p_sort:parseInt($("to").value,10)||0})))alert("Saved")};
+}
+function editTask(id){
+  var t=T.filter(function(x){return x.id===id})[0];if(!t)return;
+  $("th").textContent="Edit task";$("tid").value=t.id;$("tt").value=t.title;$("ty").value=t.type;$("te").value=t.emoji||"🎯";
+  $("tl").value=t.link||"";$("ti").value=t.instructions||"";$("tr").value=t.reward;$("ts").value=t.seconds;$("to").value=t.sort||0;$("ta").value=t.active?"1":"0";
+  window.scrollTo(0,0);
+}
+
+function rWd(){
+  var order={pending:0,paid:1,rejected:2};
+  var l=W.slice().sort(function(a,b){return order[a.status]-order[b.status]});
+  $("c").innerHTML=l.map(function(w){
+    return '<div class="card"><div class="row"><b>'+f(w.amount)+' → send '+f(w.receive)+'</b><span class="tag '+esc(w.status)+'">'+esc(w.status)+'</span></div>'+
+    '<small>'+esc(w.profiles&&w.profiles.email)+'<br>'+esc(w.bank)+' · '+esc(w.account)+'<br>'+new Date(w.created_at).toLocaleString()+'</small>'+
+    (w.status==="pending"?'<div><button class="b" data-w="'+w.id+'" data-s="paid">Mark paid</button><button class="b red" data-w="'+w.id+'" data-s="rejected">Reject &amp; refund</button></div>':'')+'</div>'}).join("")||"<small>No withdrawals yet.</small>";
+}
+
+function rSet(){
+  var k=[["welcome_bonus","Welcome bonus for new users (₦)"],["referral_bonus","Referral bonus (₦)"],["min_withdraw","Minimum withdrawal (₦)"],["fee_pct","Withdrawal charge (%)"]];
+  $("c").innerHTML='<div class="card">'+k.map(function(x){return '<label>'+x[1]+'</label><input id="s_'+x[0]+'" inputmode="decimal" value="'+esc(ST[x[0]])+'">'}).join("")+'<button class="b" id="ssv">Save settings</button></div>';
+  $("ssv").onclick=async function(){
+    for(var i=0;i<k.length;i++){var r=await sb.rpc("admin_set_setting",{p_key:k[i][0],p_value:parseFloat($("s_"+k[i][0]).value)});if(r.error){alert(r.error.message);return}}
+    await loadAll();alert("Settings saved")};
+}
+boot();
+</script>
+</body>
+</html>
