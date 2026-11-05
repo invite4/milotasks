@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Milo Tasks</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 56 56%27%3E%3Crect width=%2756%27 height=%2756%27 rx=%2716%27 fill=%27%2312b85f%27/%3E%3Cpath d=%27M28 10l14 5v10c0 8.5-5.8 14.5-14 17.5C19.8 39.5 14 33.5 14 25V15z%27 fill=%27%23fff%27/%3E%3Cpath d=%27M21 31V21.5l7 7.5 7-7.5V31%27 fill=%27none%27 stroke=%27%230a9a4f%27 stroke-width=%273.6%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<style>
+:root{--bg:#0d170f;--cd:#17241b;--ln:#26382c;--ac:#22c36b;--gold:#fbcd32;--amb:#f2b705;--tx:#f3f7f2;--mt:#9db0a2;--bad:#ff8a7a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,sans-serif;padding-bottom:130px}
+.w{max-width:480px;margin:auto;padding:16px}
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.top{display:flex;align-items:center;gap:12px}.top .g{flex:1}.top small{color:var(--mt);display:block}.top b{font-size:22px}
+.av,.ib{width:52px;height:52px;border-radius:50%;background:var(--cd);border:1px solid var(--ln);display:grid;place-items:center;color:var(--ac);font-weight:700;font-size:22px;padding:0;cursor:pointer}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:28px;padding:18px;margin:16px 0}
+.pill{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#111;border-radius:16px;padding:12px 16px;font:inherit;font-weight:600;border:0;cursor:pointer}
+.mn{position:absolute;top:56px;left:0;background:#fff;color:#111;border-radius:16px;z-index:5;min-width:200px;overflow:hidden}
+.mn div{padding:14px 16px;cursor:pointer;font-weight:600}.mn div+div{border-top:1px solid #eee}
+.amt{font-size:52px;font-weight:700;margin:18px 0 6px;word-break:break-all}.amt s{text-decoration:none;font-size:26px;color:var(--ac);margin-right:4px}
+.act{display:flex;justify-content:space-around;margin-top:16px}
+.act>div,.sv>div{text-align:center;color:var(--mt);cursor:pointer;font-size:15px}
+.c{width:64px;height:64px;border-radius:50%;background:var(--bg);border:1px solid var(--ln);color:var(--ac);display:grid;place-items:center;margin:0 auto 6px}
+.bal{background:linear-gradient(135deg,#19cb69 0%,#06ae57 45%,#006637 100%);border:0;color:#fff}.bal .amt s,.bal .m{color:rgba(255,255,255,.9)}.bal .act>div{color:#fff}.bal .c{background:rgba(0,0,0,.22);border-color:rgba(255,255,255,.25);color:#fff}.c.f,.bal .c.f{background:linear-gradient(135deg,#fbcd32,#f2b705);color:#3a2a00;border-color:var(--gold)}
+.sv{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 4px}.sv .c{width:58px;height:58px;background:var(--cd)}
+h2{font-size:22px;margin:22px 0 8px}h3{margin:0 0 6px}
+.btn{display:block;width:100%;background:linear-gradient(135deg,#14bd63,#0a9a4f);color:#fff;border:0;border-radius:999px;padding:14px 18px;font:inherit;font-weight:700;cursor:pointer;margin-top:10px;text-align:center;text-decoration:none}
+.btn.b{background:rgba(255,255,255,.25);color:#fff}.btn.g{background:var(--bg);color:var(--tx);border:1px solid var(--ln)}
+input,select{width:100%;padding:14px;margin:6px 0;border:1px solid var(--ln);border-radius:16px;background:var(--bg);color:var(--tx);font:inherit}
+.pay{background:linear-gradient(135deg,#19cb69 0%,#06ae57 45%,#006637 100%);color:#fff;border-radius:28px;padding:20px;margin:12px 0}.pay small{display:block}
+.pay h3{font-size:28px;margin:2px 0 10px}.pay .no{font-size:34px;font-weight:800;letter-spacing:1px;word-break:break-all;margin:6px 0 12px}
+.nt{border:1px solid #b8860b;background:#1d1708;border-radius:20px;padding:14px;color:#e8d9a8;font-size:14px;margin:12px 0}.nt b{color:var(--amb);display:block;font-size:16px}
+.row{display:flex;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px solid var(--ln)}
+.bp{background:#12301f;color:var(--ac);border-radius:999px;padding:12px 18px;font-weight:700}.drow{display:flex;align-items:center;gap:8px;padding:12px 0;border-top:1px solid var(--ln)}.drow:first-of-type{border-top:0}.drow .i{flex:1;min-width:0;word-break:break-word}.sn{display:block;font-size:21px;font-weight:800;color:var(--tx);line-height:1.25}.pl{border:0;border-radius:999px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;margin-top:6px}.pl.a{background:linear-gradient(135deg,#14bd63,#0a9a4f);color:#fff}.pl.r{background:#232b26;color:var(--bad)}.lk{color:var(--ac);text-decoration:underline}.m{color:var(--mt);font-size:14px}.er{color:var(--bad)}.ok{color:var(--ac)}
+nav{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:456px;margin:auto;background:#121d16;border:1px solid var(--ln);border-radius:36px;display:flex;align-items:flex-end;padding:10px 6px}
+nav>div{flex:1;text-align:center;font-size:12px;color:#5f7364;cursor:pointer}nav>div.on{color:var(--ac)}
+nav .hc{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,#fbcd32,#f2b705);color:#3a2a00;display:grid;place-items:center;margin:-38px auto 4px;border:6px solid var(--cd)}
+.bd{display:inline-block;padding:5px 14px;border-radius:999px;font-size:13px;font-weight:700;text-transform:capitalize;white-space:nowrap}.bd.pending{background:#3a2f08;color:#f5c518}.bd.paid,.bd.approved{background:#0f3a24;color:#22c36b}.bd.rejected{background:#3a1512;color:#ff8a7a}.chip{border:1px solid var(--ln);background:var(--cd);color:var(--mt);border-radius:999px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer}.chip.on{background:var(--ac);color:#08110c;border-color:var(--ac)}
+</style></head><body>
+<div class="w" id="app"></div><nav id="nav" hidden></nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.min.js"></script>
+<script>
+const SB_URL='https://famxzlanyngsyrzfidhq.supabase.co', SB_KEY='sb_publishable_xyTHdvmlPtlP0VCyADJKPA_ZOO8YG6o';
+const BANK={bank:'PalmPay',name:'Veronica Dooshima Apinega (MiloTasks)',no:'8958769248'};
+const FEE=1000, TG='https://t.me/nshdvsbsksb';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const url=u=>/^https:\/\//.test(u)?esc(u):'#';
+const money=n=>Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const N0=n=>'₦'+Number(n||0).toLocaleString('en-US');
+const ref=new URLSearchParams(location.search).get('ref')||'';
+const P={home:'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10',wallet:'M3 7a2 2 0 0 1 2-2h13v4M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-1zM16 14h2',star:'M12 3l2.8 5.8 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.3l1.1-6.2L3 9.7l6.2-.9z',plus:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v8M8 12h8',users:'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.5a3 3 0 0 1 0 5.5M18 14.5c2 .8 3.5 2.5 3.5 5.5',list:'M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2',up:'M12 19V5M6 11l6-6 6 6',clock:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2',head:'M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v5H5a1 1 0 0 1-1-1v-4zM20 14h-3v5h2a1 1 0 0 0 1-1v-4z',user:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4.4 3.6-8 8-8s8 3.6 8 8',shield:'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',down:'M6 9l6 6 6-6'};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${P[n]}"/></svg>`;
+let me=null,user=null,S={tab:'home',sel:'total',menu:false,msg:'',ok:false,pre:'task'};
+const nm=()=>{const n=(user.user_metadata&&user.user_metadata.name)||user.email.split('@')[0];return n.charAt(0).toUpperCase()+n.slice(1)};
+const greet=()=>{const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'};
+const note=()=>S.msg?`<p class="${S.ok?'ok':'er'}">${esc(S.msg)}</p>`:'';
+const tile=(i,l,t,c='')=>`<div ${t=='help'?'data-a="help"':`data-go="${t}"`}><div class="c ${c}">${ic(i)}</div>${l}</div>`;
+const LOGO=(s=52)=>`<svg width="${s}" height="${s}" viewBox="0 0 56 56" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#25d676"/><stop offset="1" stop-color="#05913f"/></linearGradient></defs><rect width="56" height="56" rx="16" fill="url(#lg)"/><path d="M28 10l14 5v10c0 8.5-5.8 14.5-14 17.5C19.8 39.5 14 33.5 14 25V15z" fill="#fff"/><path d="M21 31V21.5l7 7.5 7-7.5V31" fill="none" stroke="#0a9a4f" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const brand=p=>`<div class="top" style="margin-bottom:14px">${LOGO()}<b style="font-size:30px;flex:1">Milo<span style="color:var(--ac)">Tasks</span></b>${p?`<span class="bp">${p}</span>`:''}</div>`;
+const refLink=()=>location.origin+location.pathname+'?ref='+me.ref_code;
+
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){me=null;return authView()}
+  user=session.user;
+  const {data}=await sb.from('milo_profiles').select('*').eq('id',user.id).single();
+  me=data;
+  if(!me){$('#app').innerHTML='<h2>Almost there</h2><p class="m">Your account setup is not finished. Tap below and tell support your email.</p><a class="btn" href="'+TG+'">Message support</a>';return}
+  draw();
+}
+function authView(login){
+  $('#nav').hidden=true;
+  $('#app').innerHTML=`<div style="margin-top:30px">${brand()}</div><p class="m">Activate your account, join channels, and earn.</p>
+  <div class="card"><h3>${login?'Log in':'Create account'}</h3>
+  ${login?'':'<input id="nm" placeholder="Your name" autocomplete="name">'}
+  <input id="em" type="email" placeholder="Email" autocomplete="email">
+  <input id="pw" type="password" placeholder="Password (6+ characters)" autocomplete="${login?'current-password':'new-password'}">
+  <p class="er" id="er"></p><button class="btn" id="go">${login?'Log in':'Create account'}</button>
+  <button class="btn g" id="sw">${login?'New here? Create account':'Have an account? Log in'}</button></div>`;
+  $('#sw').onclick=()=>authView(!login);
+  $('#go').onclick=async()=>{
+    const email=$('#em').value.trim(),password=$('#pw').value,name=login?'':$('#nm').value.trim();
+    const r=login?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password,options:{data:{ref,name}}});
+    if(r.error)return $('#er').textContent=r.error.message;
+    if(!r.data.session)return $('#er').textContent='Check your email to confirm, then log in.';
+    boot();
+  };
+}
+async function draw(){
+  const nv=[['list','Task','tasks'],['star','Activate','activate'],['home','Home','home'],['users','Refer','refer'],['user','Profile','profile']];
+  $('#nav').hidden=false;
+  $('#nav').innerHTML=nv.map(([i,l,t])=>t=='home'?`<div data-go="home" class="${S.tab==t?'on':''}"><div class="hc">${ic(i)}</div>${l}</div>`:`<div data-go="${t}" class="${S.tab==t?'on':''}">${ic(i)}<br>${l}</div>`).join('');
+  $('#app').innerHTML=await V[S.tab]();
+}
+const badge=s=>`<span class="bd ${esc(s)}">${esc(s)}</span>`;
+const back=`<div style="margin-bottom:8px"><button class="pill" data-go="home">← Home</button></div>`;
+const V={
+ home(){
+  const bal=S.sel=='task'?me.task_bal:S.sel=='aff'?me.aff_bal:+me.task_bal+ +me.aff_bal;
+  const lab={total:'Total balance',task:'Task wallet',aff:'Affiliate wallet'}[S.sel];
+  const sv=[['users','Referral','refer'],['list','Tasks','tasks'],['up','Withdraw','withdraw'],['clock','History','history'],['star','Activate','activate'],['head','Support','help'],['user','Profile','profile']];
+  if(me.is_admin)sv.push(['shield','Admin','admin']);
+  return brand(N0(+me.task_bal+ +me.aff_bal))+`<div class="top"><div class="av">${esc(nm()[0])}</div><div class="g"><small>${greet()} 👋</small><b>${esc(nm())}</b></div><button class="ib" data-a="help" aria-label="Support">${ic('head')}</button></div>${note()}
+  <div class="card bal"><div style="position:relative;display:inline-block"><button class="pill" data-a="menu">${ic('wallet')}${lab}${ic('down')}</button>
+  ${S.menu?`<div class="mn"><div data-a="sel:total">Total balance</div><div data-a="sel:task">Task wallet</div><div data-a="sel:aff">Affiliate wallet</div></div>`:''}</div>
+  <div class="amt"><s>₦</s>${money(bal)}</div><div class="m">${me.active?'Account active':'Account not active'}</div>
+  <div class="act">${tile('wallet','Wallets','wallets')}${tile('star','Activate','activate')}${tile('plus','Fund','activate','f')}</div></div>
+  <h2>Our Services</h2><div class="sv">${sv.map(x=>tile(...x)).join('')}</div>
+  <div class="card"><h3>Share &amp; earn</h3><p class="m">Invite friends and earn ${N0(200)} in your Affiliate wallet each time one activates.</p><button class="btn" data-a="copylink">Copy invite link</button></div>`;
+ },
+ async activate(){
+  if(me.active)return back+`<div class="card"><h3>You're active</h3><p>Your account is active. Open Tasks to start earning for each channel you join.</p><button class="btn" data-go="tasks">Go to tasks</button></div>`;
+  const {data:d}=await sb.from('milo_deposits').select('*').eq('user_id',me.id).order('id',{ascending:false}).limit(1);
+  const pend=d&&d[0]&&d[0].status=='pending';
+  return back+`<h2 style="margin-top:8px">Activate your account</h2>${note()}
+  <div class="card"><p class="m" style="margin:0">1. Amount to pay</p><div class="amt" style="font-size:40px;margin:4px 0"><s>₦</s>${money(FEE)}</div></div>
+  <h3>2. Send the money to this account</h3>
+  <div class="pay"><small>Activation account</small><h3>${esc(BANK.bank)}</h3><small>${esc(BANK.name)}</small><div class="no">${esc(BANK.no)}</div><button class="btn b" data-a="copy">Copy number</button></div>
+  <div class="nt"><b>Important notice</b>Send the exact amount, then tell us the name of the account you paid from. Your account is activated after the payment is confirmed.</div>
+  <h3>3. Confirm your payment</h3>${pend?'<p class="ok">Your payment is waiting for approval.</p>':`<input id="sn" placeholder="Name on the account you paid from"><p class="m" style="margin:8px 0 2px">Type your name exactly as in your bank app, then upload your payment screenshot (required).</p><input id="sf" type="file" accept="image/*"><button class="btn" data-a="pay">I have paid</button>`}`;
+ },
+ async tasks(){
+  const [{data:ts},{data:cs}]=await Promise.all([sb.from('milo_tasks').select('*').order('id'),sb.from('milo_claims').select('task_id').eq('user_id',me.id)]);
+  const done=new Set((cs||[]).map(c=>c.task_id));
+  return back+`<h2 style="margin-top:8px">Tasks</h2>${note()}`+(me.active?'':'<p class="er">Activate your account to claim rewards.</p>')+
+  ((ts||[]).map(t=>`<div class="card"><h3>${esc(t.title)}</h3><p class="m">${t.slots} slots left · earn ${N0(t.reward??50)}</p>
+   <a class="btn g" href="${url(t.link)}" target="_blank" rel="noopener">Open channel</a>
+   ${done.has(t.id)?'<button class="btn g">Claimed</button>':t.slots>0?`<button class="btn" data-a="claim:${t.id}">Claim ${N0(t.reward??50)}</button>`:'<button class="btn g">Full</button>'}</div>`).join('')||'<p class="m">No tasks right now. Check back soon.</p>');
+ },
+ wallets(){
+  return back+`<h2 style="margin-top:8px">Wallets</h2>
+  <div class="card"><p class="m" style="margin:0">Task wallet</p><div class="amt" style="font-size:38px"><s>₦</s>${money(me.task_bal)}</div><p class="m">Minimum withdrawal ${N0(10000)}</p><button class="btn" data-a="wd:task">Withdraw</button></div>
+  <div class="card"><p class="m" style="margin:0">Affiliate wallet</p><div class="amt" style="font-size:38px"><s>₦</s>${money(me.aff_bal)}</div><p class="m">Minimum withdrawal ${N0(1000)}</p><button class="btn" data-a="wd:affiliate">Withdraw</button></div>`;
+ },
+ async withdraw(){
+  const {data:w}=await sb.from('milo_withdrawals').select('*').eq('user_id',me.id).order('id',{ascending:false});
+  return back+`<h2 style="margin-top:8px">Withdraw</h2><div class="card">${note()}
+  <p class="m">Minimum: ${N0(10000)} from Task wallet, ${N0(1000)} from Affiliate wallet. Your account must be active.</p>
+  <select id="wl"><option value="task" ${S.pre=='task'?'selected':''}>Task wallet · ${N0(me.task_bal)}</option><option value="affiliate" ${S.pre=='affiliate'?'selected':''}>Affiliate wallet · ${N0(me.aff_bal)}</option></select>
+  <input id="am" type="number" placeholder="Amount"><input id="ac" placeholder="Bank, account name, account number">
+  <button class="btn" data-a="wdsend">Request withdrawal</button></div><h3>Recent withdrawals</h3>`+((w||[]).slice(0,5).map(x=>`<div class="row"><span>${N0(x.amount)} <span class="m">${esc(x.wallet)}</span><br><span class="m" style="font-size:12px">${x.created?new Date(x.created).toLocaleString():''}</span></span>${badge(x.status)}</div>`).join('')||'<p class="m">No withdrawals yet.</p>')+`<button class="btn g" data-go="wdhist">See full withdrawal history</button>`;
+ },
+ async wdhist(){
+  const {data:w}=await sb.from('milo_withdrawals').select('*').eq('user_id',me.id).order('id',{ascending:false});
+  const L=w||[],sum=s=>L.filter(x=>x.status==s).reduce((a,x)=>a+ +x.amount,0);
+  return `<div style="margin-bottom:8px"><button class="pill" data-go="withdraw">← Withdraw</button></div><h2 style="margin-top:8px">Withdrawal history</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="card" style="margin:0;text-align:center"><b style="font-size:22px;color:var(--ac)">${N0(sum('paid'))}</b><div class="m">Paid</div></div><div class="card" style="margin:0;text-align:center"><b style="font-size:22px;color:#f5c518">${N0(sum('pending'))}</b><div class="m">Pending</div></div></div>
+  <div class="card">${L.map(x=>`<div class="drow"><div class="i"><b>${N0(x.amount)}</b> <span class="m">${esc(x.wallet)} wallet</span><div class="m" style="font-size:12px">${x.created?new Date(x.created).toLocaleString():''}</div></div>${badge(x.status)}</div>`).join('')||'<p class="m">No withdrawals yet.</p>'}</div>`;
+ },
+ async awd(){
+  const f=S.wf||'all',q=(S.wq||'').replace(/[%,()]/g,'');
+  let r=sb.from('milo_withdrawals').select('*');if(f!='all')r=r.eq('status',f);if(q)r=r.ilike('email','%'+q+'%');
+  const {data:w}=await r.order('id',{ascending:false}).limit(200);
+  const L=w||[],tot=L.reduce((a,x)=>a+ +x.amount,0);
+  return `<div style="margin-bottom:8px"><button class="pill" data-go="admin">← Admin</button></div><h2 style="margin-top:8px">Withdrawal history</h2>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">${['all','pending','paid','rejected'].map(s=>`<button class="chip ${f==s?'on':''}" data-a="wf:${s}" style="text-transform:capitalize">${s}</button>`).join('')}</div>
+  <div class="card" style="margin:0 0 10px"><input id="wq" placeholder="Search by email" value="${esc(S.wq||'')}"><button class="btn g" data-a="wsearch">Search</button></div>
+  <p class="m">${L.length} record${L.length==1?'':'s'} · Total ${N0(tot)}</p>
+  <div class="card">${L.map(x=>`<div class="drow"><div class="i"><b>${esc(x.email)}</b><div class="m">${N0(x.amount)} · ${esc(x.wallet)} wallet</div><div class="m">${esc(x.account)}</div><div class="m" style="font-size:12px">${x.created?new Date(x.created).toLocaleString():''}</div></div>${badge(x.status)}</div>`).join('')||'<p class="m">No records.</p>'}</div>`;
+ },
+ async history(){
+  const [{data:d},{data:w}]=await Promise.all([sb.from('milo_deposits').select('*').eq('user_id',me.id),sb.from('milo_withdrawals').select('*').eq('user_id',me.id)]);
+  const L=[...(d||[]).map(x=>({t:x.created,a:'Activation payment '+N0(FEE),s:x.status})),...(w||[]).map(x=>({t:x.created,a:'Withdrawal '+N0(x.amount)+' ('+x.wallet+')',s:x.status}))].sort((a,b)=>new Date(b.t)-new Date(a.t));
+  return back+`<h2 style="margin-top:8px">History</h2>`+(L.map(x=>`<div class="row"><span>${esc(x.a)}<br><span class="m">${x.t?new Date(x.t).toLocaleDateString():''}</span></span>${badge(x.s)}</div>`).join('')||'<p class="m">Nothing here yet.</p>');
+ },
+ refer(){
+  return `<h2>Refer and earn</h2>${note()}<div class="card"><p>You earn ${N0(200)} in your Affiliate wallet when someone you invite activates their account.</p>
+  <p class="m">Your code: <b>${esc(me.ref_code)}</b></p><input id="lk" readonly value="${esc(refLink())}"><button class="btn" data-a="copylink">Copy invite link</button></div>`;
+ },
+ profile(){
+  return `<div class="top"><div class="av">${esc(nm()[0])}</div><div class="g"><b>${esc(nm())}</b><small>${esc(user.email)}</small></div></div>
+  <div class="card"><div class="row"><span>Status</span><span class="m">${me.active?'Active':'Not active'}</span></div><div class="row"><span>Referral code</span><span class="m">${esc(me.ref_code)}</span></div>
+  <button class="btn" data-a="help">Contact Support</button><button class="btn g" data-a="out">Log out</button></div>`;
+ },
+ async admin(){
+  const q=S.q||'';
+  let cr=[];if(S.cq){const t=S.cq.replace(/[%,()]/g,'');let r=await sb.from('milo_profiles').select('email,name').or('email.ilike.%'+t+'%,name.ilike.%'+t+'%').limit(8);if(r.error)r=await sb.from('milo_profiles').select('email').ilike('email','%'+t+'%').limit(8);cr=r.data||[]}
+  let uq=sb.from('milo_profiles').select('*');if(q){const t=q.replace(/[%,()]/g,'');uq=uq.or('email.ilike.%'+t+'%,name.ilike.%'+t+'%')}
+  const [{data:d},{data:w},{data:ts},{data:us},{data:all}]=await Promise.all([
+   sb.from('milo_deposits').select('*').eq('status','pending').order('id'),sb.from('milo_withdrawals').select('*').eq('status','pending').order('id'),
+   sb.from('milo_tasks').select('*').order('id'),uq.order('email').limit(20),sb.from('milo_profiles').select('email,active').order('email').limit(1000)]);
+  const pu={};await Promise.all((d||[]).filter(x=>x.proof).map(async x=>{const r=await sb.storage.from('milo-proofs').createSignedUrl(x.proof,3600);pu[x.id]=r.data&&r.data.signedUrl}));
+  const st=[['Users',(all||[]).length],['Active',(all||[]).filter(x=>x.active).length],['Pending deposits',(d||[]).length],['Pending withdrawals',(w||[]).length]];
+  const none='<p class="m" style="margin:0">None pending.</p>';
+  return `<h2>Admin</h2>${note()}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${st.map(([l,n])=>`<div class="card" style="margin:0;text-align:center"><b style="font-size:26px">${n}</b><div class="m">${l}</div></div>`).join('')}</div>
+  <div class="card"><h3>Publish task</h3><input id="tt" placeholder="Task title (e.g. Join Channel Name)"><input id="tl" placeholder="Link (https://...)"><input id="tn" type="number" placeholder="Slots (joins paid for)"><input id="tr" type="number" placeholder="Reward per user (₦)"><button class="btn" data-a="atask">Publish task</button></div>
+  <div class="card"><h3>Add money to a user</h3><input id="cq" placeholder="Search by name or email" value="${esc(S.cq||'')}" autocomplete="off"><button class="btn g" data-a="csearch">Search</button>${S.cu?`<div class="drow"><div class="i"><b>${esc(S.cu.name||S.cu.email)}</b><div class="m">${esc(S.cu.email)} · selected</div></div><button class="pl r" data-a="cclear">Change</button></div>`:((cr||[]).map(u=>`<div class="drow"><div class="i"><b>${esc(u.name||u.email)}</b><div class="m">${u.name?esc(u.email):''}</div></div><button class="pl a" data-a="cpick" data-e="${esc(u.email)}" data-n="${esc(u.name||'')}">Select</button></div>`).join('')||(S.cq?'<p class="m">No user found.</p>':''))}<select id="cw"><option value="task">Task wallet</option><option value="affiliate">Affiliate wallet</option></select><input id="ca" type="number" placeholder="Amount (₦, use a minus to remove)"><button class="btn" data-a="credit">Add money</button></div>
+  <div class="card"><h3>Deposits</h3>${(d||[]).map(x=>`<div class="drow"><div class="i"><b class="sn">${esc(x.sender)}</b><div class="m">${esc(x.email)}</div><div class="m">${N0(FEE)} · ${pu[x.id]?`<a class="lk" href="${esc(pu[x.id])}" target="_blank" rel="noopener">View proof</a>`:'No proof'}${x.created?' · '+new Date(x.created).toLocaleString():''}</div></div><button class="pl a" data-a="dep:${x.id}:1">Approve</button><button class="pl r" data-a="dep:${x.id}:0">Reject</button></div>`).join('')||none}</div>
+  <div class="card"><h3>Withdrawals</h3><button class="btn g" data-go="awd" style="margin:0 0 8px">View withdrawal history</button>${(w||[]).map(x=>`<div class="drow"><div class="i"><b>${esc(x.email)}</b><div class="m">${N0(x.amount)} · ${esc(x.wallet)} wallet</div><div class="m">${esc(x.account)}</div></div><button class="pl a" data-a="wdr:${x.id}:1">Paid</button><button class="pl r" data-a="wdr:${x.id}:0">Reject</button></div>`).join('')||none}</div>
+  <div class="card"><h3>Manage tasks</h3>${(ts||[]).map(t=>`<div class="drow" style="display:block"><b>${esc(t.title)}</b><div class="m">${t.slots} slots left · ${N0(t.reward??50)} each</div><input id="ts${t.id}" type="number" placeholder="New slots"><button class="pl a" data-a="tset:${t.id}">Update slots</button> <button class="pl r" data-a="tdel:${t.id}">Delete</button></div>`).join('')||'<p class="m" style="margin:0">No tasks yet.</p>'}</div>
+  <div class="card"><h3>Users</h3><input id="uq" placeholder="Search by name or email" value="${esc(q)}"><button class="btn g" data-a="usearch">Search</button>${(us||[]).map(u=>`<div class="drow"><div class="i"><b>${esc(u.name||u.email)}</b><div class="m">${u.name?esc(u.email)+' · ':''}${u.active?'Active':'Not active'} · Task ${N0(u.task_bal)} · Affiliate ${N0(u.aff_bal)}</div></div><button class="pl ${u.active?'r':'a'}" data-a="uact:${u.active?0:1}" data-e="${esc(u.email)}">${u.active?'Deactivate':'Activate'}</button></div>`).join('')}</div>
+  <button class="btn g" data-go="home" style="border-color:var(--ac);color:var(--ac)">Exit admin</button>`;
+ }
+};
+async function run(p,okmsg){const {error}=await p;S.msg=error?error.message:okmsg;S.ok=!error;await boot()}
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-go],[data-a]');if(!t||!me)return;
+  const g=t.dataset.go,a=t.dataset.a||'',[k,x,y]=a.split(':');
+  if(g){S.tab=g;S.msg='';S.menu=false;return draw()}
+  if(a=='menu'){S.menu=!S.menu;return draw()}
+  if(k=='sel'){S.sel=x;S.menu=false;return draw()}
+  if(a=='help')return window.open(TG,'_blank');
+  if(a=='copy'||a=='copylink'){try{await navigator.clipboard.writeText(a=='copy'?BANK.no:refLink())}catch(_){}t.textContent='Copied';return}
+  if(a=='out'){await sb.auth.signOut();me=null;return authView(true)}
+  if(k=='wd'){S.pre=x;S.tab='withdraw';S.msg='';return draw()}
+  if(a=='pay'){const v=$('#sn').value.trim(),f=$('#sf').files[0];
+   if(v.length<3){S.msg='Enter your full name as it shows on the account you paid from';S.ok=false;return draw()}
+   if(!f){S.msg='Upload your payment screenshot';S.ok=false;return draw()}
+   if(f.size>5e6){S.msg='Screenshot is too big (max 5MB)';S.ok=false;return draw()}
+   t.textContent='Uploading...';const pth=me.id+'/'+Date.now()+'.'+((f.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,'').slice(0,5)||'jpg');
+   const {error}=await sb.storage.from('milo-proofs').upload(pth,f);if(error){S.msg='Upload failed: '+error.message;S.ok=false;return draw()}
+   return run(sb.rpc('milo_submit_deposit',{p_sender:v,p_proof:pth}),'Payment submitted. Wait for approval.')}
+  if(k=='claim')return run(sb.rpc('milo_claim_task',{p_task:+x}),'Reward added.');
+  if(a=='wdsend'){S.pre=$('#wl').value;return run(sb.rpc('milo_request_withdraw',{p_wallet:S.pre,p_amt:+$('#am').value,p_acct:$('#ac').value.trim()}),'Withdrawal requested.')}
+  if(a=='atask'){const l=$('#tl').value.trim(),n=+$('#tn').value,rw=+$('#tr').value,ti=$('#tt').value.trim();if(!ti||!/^https:\/\//.test(l)||n<1||!(rw>0)){S.msg='Enter a title, an https link, slots (1 or more) and a reward above 0';S.ok=false;return draw()}return run(sb.rpc('milo_admin_add_task',{p_title:ti,p_link:l,p_slots:n,p_reward:rw}),'Task added.')}
+  if(k=='tset')return run(sb.rpc('milo_admin_task',{p_id:+x,p_slots:+$('#ts'+x).value,p_delete:false}),'Slots updated.');
+  if(k=='tdel'){if(!confirm('Delete this task?'))return;return run(sb.rpc('milo_admin_task',{p_id:+x,p_slots:0,p_delete:true}),'Task deleted.')}
+  if(k=='wf'){S.wf=x;S.tab='awd';return draw()}
+  if(a=='wsearch'){S.wq=$('#wq').value.trim();return draw()}
+  if(a=='csearch'){S.cq=$('#cq').value.trim();S.cu=null;S.msg='';return draw()}
+  if(a=='cpick'){S.cu={email:t.dataset.e,name:t.dataset.n||''};S.msg='';return draw()}
+  if(a=='cclear'){S.cu=null;return draw()}
+  if(a=='credit'){const em=S.cu&&S.cu.email,amt=+$('#ca').value;if(!em){S.msg='Search and select a user first';S.ok=false;return draw()}if(!amt){S.msg='Enter an amount';S.ok=false;return draw()}await run(sb.rpc('milo_admin_credit',{p_email:em,p_wallet:$('#cw').value,p_amt:amt}),'Balance updated for '+em+'.');if(S.ok)S.cu=null;return draw()}
+  if(k=='uact')return run(sb.rpc('milo_admin_set_active',{p_email:t.dataset.e,p_active:x=='1'}),'User updated.');
+  if(a=='usearch'){S.q=$('#uq').value.trim();S.msg='';return draw()}
+  if(k=='dep')return run(sb.rpc('milo_approve_deposit',{p_id:+x,p_ok:y=='1'}),'Done.');
+  if(k=='wdr')return run(sb.rpc('milo_settle_withdraw',{p_id:+x,p_paid:y=='1'}),'Done.');
+});
+boot();
+</script></body></html>
